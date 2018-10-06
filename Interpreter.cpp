@@ -2,6 +2,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<stdio.h>
 using namespace std;
 
 class SExp
@@ -16,8 +17,12 @@ class SExp
 int main()
 {
 	FILE *fp = stdin;
-	char c = (char)fgetc(fp);
-	cout<<c<<'\n';
+	char c = '';
+	while( c != '\0')
+	{
+		c = (char)fgetc(fp);	
+		cout<<c<<'\n';
+	}		
 	string input;
 	getline(cin,input);
 	//cout<<"String : "<<input<<'\n';
