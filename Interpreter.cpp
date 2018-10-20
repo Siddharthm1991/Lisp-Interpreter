@@ -14,25 +14,65 @@ class SExp
 	int val;
 	string name;
 	SExp *left;
-	SExp *right;		
+	SExp *right;	
+	SExp *root;	
 	SExp()
 	{
 		type = -1;
 		val = -1;
 		name = "";
 		left = NULL;
-		right = NULL;
+		right = NULL;		
 	}			
 	
 	SExp* input()
 	{
 		int nxtToken = getNextToken();	
-		cout<<"Return Int : "<<nxtToken<<'\n';	
-		if(nxtToken >= 1 && nxtToken <=8)
+//		cout<<"Return Int : "<<nxtToken<<'\n';
+//		cout<<"Token : "<<tokenVal<<'\n';			
+		if(nxtToken == 1)
 		{
-			cout<<"Token : "<<tokenVal<<'\n';	
-			input();
-		} 			
+			//cout<<"Return Int : "<<nxtToken<<'\n';
+			//cout<<"Token : "<<tokenVal<<'\n';	
+			SExp* s1 = input();
+//			if(s1 -> val != -1)
+//				cout<<"S1Exp Val : "<<s1->val<<'\n';
+//			if(s1->name != "")
+//				cout<<"S1Exp Name : "<<s1->name<<'\n';
+			
+			SExp* s2 = input();						
+//			if(s2 -> val != -1)
+//				cout<<"S2Exp Val : "<<s2->val<<'\n';
+//			if(s2->name != "")
+//				cout<<"S2Exp Name : "<<s2->name<<'\n';
+			//cout<<"Call to cons"<<'\n';
+			return cons(s1, s2);
+		} 	
+		else if(nxtToken == 4 || nxtToken == 7)
+		{
+			//cout<<"Return Int : "<<nxtToken<<'\n';	
+			//cout<<"Token : "<<tokenVal<<'\n';
+			int i = stoi(tokenVal);
+			SExp* temp = new SExp();
+			temp->val = i;
+			temp->type = 1;
+			return temp;
+		}
+		else if(nxtToken == 5 || nxtToken == 8)
+		{
+			//cout<<"Return Int : "<<nxtToken<<'\n';	
+			//cout<<"Token : "<<tokenVal<<'\n';			
+			SExp* temp = new SExp();
+			temp->name = tokenVal;
+			temp->type = 2;
+			return temp;
+		}		
+		else if(nxtToken >= 2 && nxtToken <= 8)
+		{
+			//cout<<"Return Int : "<<nxtToken<<'\n';	
+			//cout<<"Token : "<<tokenVal<<'\n';
+			input();	
+		}		
 		else
 			return NULL;		
 	}	
@@ -90,7 +130,62 @@ class SExp
 		if(c == EOF)
 			return 9;		
 	}
+	
+	SExp* cons(SExp* s1, SExp* s2)
+	{
+		if(root == NULL)
+		{
+			root->left = s1;
+			root->right = s2;
+		}
+		else
+		{
+			SExp* temp = new SExp();	
+			temp->left = s1;
+			temp->right = s2;
+			root = temp;
+		}
+		
+		return root;
+	}
+	
+	void print(SExp* res)
+	{
+		if(res->left)
+		{
+			cout<<"(";
+			if(res->left->type == 1)
+				cout<<res->left->val;
+			else
+				cout<<res->left->name;
+			print(res->left);
+			cout<<" . ";
+		}
+		
+		if(res->right)
+		{
+			if(res->right->type == 1)
+				cout<<res->right->val;
+			else
+				cout<<res->right->name;
+			print(res->right);			
+			cout<<")";
+		}
+	}
 };
+
+int main()
+{
+	SExp s;
+	SExp* res;
+	res = s.input();
+	cout<<"> ";
+	s.print(res);
+	//cout<<"Final Result : "<<res->right->right->name<<'\n';
+}
+
+
+//Approach 1 Code
 
 /*class Intr
 {		
@@ -162,9 +257,3 @@ class SExp
 	}
 };*/
 
-
-int main()
-{
-	SExp s;
-	s.input();
-}
