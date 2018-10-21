@@ -1,16 +1,12 @@
-(DEFUN . (MINUS2 . ((A . (B . NIL)) . ((MINUS . (A . (B . NIL))) . NIL))))
+(DEFUN SILLY (A B) (PLUS A B))
 $
-(NOTSOSILLY . (0 . (0 . NIL)))
+(B B)
 $
-(CONS . (4 . ((A . B) . NIL)))
+()
 $
-(CONS 4 (QUOTE (A . B)))
+( )
 $
-(2 . (3 . (4 . NIL)))
+( 2 . ( 2 . NIL ) )
 $
-(SILLY 5 6)
-$
-(SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )
-$
-(DEFUN NOTSOSILLY (A B) (COND ((EQ A 0) (PLUS B 1)) ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1)) (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1))))))
+( 2 . (3 4) . 5)
 $$
