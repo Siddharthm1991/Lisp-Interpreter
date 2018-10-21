@@ -1,9 +1,17 @@
+//Things left to do
+/*
+	1. Standard SExp for T and NIL (Done)
+	2. Run program for "()" input (Done) 
+	3. Use the same identifier instead of creating new ones (Implement by map) (Done)
+	4. Error checking
+*/
 //Lisp Interpreter Project
 #include<iostream>
 #include<string>
 #include<vector>
 #include<stdio.h>
 #include<stdlib.h>
+#include<map>
 using namespace std;
 
 string tokenVal = "";
@@ -13,13 +21,16 @@ int k = 0;
 class SExp
 {	
 	public:
+	map<string,SExp*> idMap;
 	FILE *fp = stdin;
 	int type;
 	int val;
 	string name;
 	SExp *left;
 	SExp *right;	
-	SExp *root;	
+	SExp *root;
+	SExp *Nil;
+	SExp *T;
 	SExp()
 	{
 		type = -1;
@@ -28,7 +39,16 @@ class SExp
 		left = NULL;
 		right = NULL;		
 		root = NULL;
-	}			
+	}	
+	SExp(string txt)
+	{
+		type = 2;
+		val = -1;
+		name = txt;
+		left = NULL;		
+		right = NULL;
+		root = NULL;
+	}	
 	
 	SExp* input()
 	{		
@@ -37,8 +57,8 @@ class SExp
 //		cout<<"Token : "<<tokenVal<<'\n';			
 		if(nxtToken == 1)
 		{
-			//cout<<"Return Int : "<<nxtToken<<'\n';
-			//cout<<"Token : "<<tokenVal<<'\n';	
+//			cout<<"Return Int : "<<nxtToken<<'\n';
+//			cout<<"Token : "<<tokenVal<<'\n';	
 			SExp* s1 = input();
 			int nxtToken = getNextToken();
 //			cout<<"-----------------------"<<'\n';
@@ -53,7 +73,7 @@ class SExp
 			if(localBuffer == '.')
 			{
 				s2 = input();
-			}
+			}			
 			else
 			{				
 				s2 = input2(nxtToken);
@@ -74,13 +94,34 @@ class SExp
 		else if(nxtToken == 5 || nxtToken == 8)
 		{
 			//cout<<"Return Int : "<<nxtToken<<'\n';	
-			//cout<<"Token : "<<tokenVal<<'\n';			
-			SExp* temp = new SExp();
-			temp->name = tokenVal;
-			temp->type = 2;
-			//input();
-			return temp;
-			
+			//cout<<"Token : "<<tokenVal<<'\n';	
+			if(tokenVal == "NIL")	
+			{				
+				return Nil;	
+			}	
+			else if(tokenVal == "T")
+			{				
+				return T;
+			}
+			else
+			{
+				SExp* temp = new SExp();
+				//cout<<"TokenVal in ID : "<<tokenVal<<'\n';
+				if(idMap[tokenVal])
+				{
+					//cout<<"Existing ID"<<'\n';
+					temp = idMap[tokenVal];
+				}
+				else
+				{
+					//cout<<"Creating New Id"<<'\n';
+					temp->name = tokenVal;
+					temp->type = 2;
+					idMap[tokenVal] = temp;
+					//input();					
+				}			
+				return temp;						
+			}						
 		}		
 		else if(nxtToken >= 2 && nxtToken <= 8)
 		{
@@ -95,11 +136,8 @@ class SExp
 	SExp* input2(int nxtToken)
 	{			
 		if(nxtToken == 2)
-		{			
-			SExp* temp = new SExp();
-			temp->name = "NIL";
-			temp->type = 2;
-			return temp;
+		{					
+			return Nil;
 		}	
 		else if(nxtToken == 10)
 			return NULL;
@@ -114,7 +152,8 @@ class SExp
 	
 	int getNextToken()
 	{		
-		tokenVal = "";		
+		tokenVal = "";
+		localBuffer = ' ';		
 		char c = str[k++];
 		if(c=='(')
 		{
@@ -163,7 +202,7 @@ class SExp
 			if(str[k] == '.')
 				localBuffer = '.';
 			else
-				localBuffer = 'n';
+				localBuffer = str[k];
 			return 6;			
 		}
 		if(c == EOF)
@@ -183,6 +222,7 @@ class SExp
 	{
 		if(res->left)
 		{
+			//cout<<"::"<<res->left;
 			cout<<"(";
 			if(res->left->type == 1)
 				cout<<res->left->val;
@@ -194,6 +234,7 @@ class SExp
 		
 		if(res->right)
 		{
+			//cout<<"}}"<<res->right;
 			if(res->right->type == 1)
 				cout<<res->right->val;
 			else
@@ -214,16 +255,38 @@ class SExp
 	
 	void init()
 	{	
+		//cout<<"Start"<<'\n';
 		SExp *res;
 		str = "";
 		k = 0;
+		idMap.clear();
 		char c = (char)fgetc(fp);
 		while(c != '$')
 		{
 			str += c;
 			c = (char)fgetc(fp);
 		}		
-		res = input();
+		//cout<<"Input : "<<str<<'\n';
+		int nxtToken = getNextToken();
+		if(nxtToken == 1)
+		{
+			int nxtToken = getNextToken();
+			if(localBuffer == ')' || nxtToken == 2)
+			{
+				//cout<<"In localbuffer"<<'\n';				
+				res = Nil;
+			}
+			else
+			{
+				k = 0;
+				res = input();
+			}
+		}
+		else
+		{
+			k = 0;
+			res = input();	
+		}		
 		cout<<"> ";
 		if(res->left == NULL && res->right == NULL)
 		{
@@ -240,11 +303,11 @@ class SExp
 		
 };
 
-
-
 int main()
 {	
 	SExp s;	
+	s.Nil = new SExp("NIL");
+	s.T = new SExp("T");
 	s.init();	
 }
 
