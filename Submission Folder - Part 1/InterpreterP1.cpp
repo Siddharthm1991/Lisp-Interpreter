@@ -1,13 +1,3 @@
-//Things left to do
-/*
-	1. Standard SExp for T and NIL (Done)
-	2. Run program for "()" input (Done) 
-	3. Use the same identifier instead of creating new ones (Implement by map) (Done)
-	4. Error checking (Unexpected characters (Done), Multiple dots in a row (Done), $ inside s-expression(Done), Parenthesis mismatch(Done))	
-	5. Some s-expressions not being handled ( Right parenthesis issue (Done) , dot and list mixed issue not working)
-	6. Signed integers (Done)	
-	7. Create the primitive functions (Done)
-*/
 //Lisp Interpreter Project
 #include<iostream>
 #include<string>
@@ -63,8 +53,7 @@ class SExp
 	void print(SExp* res)
 	{
 		if(res->left)
-		{
-			//cout<<"::"<<res->left;
+		{			
 			cout<<"(";
 			if(res->left->type == 1)
 				cout<<res->left->val;
@@ -75,8 +64,7 @@ class SExp
 		}
 		
 		if(res->right)
-		{
-			//cout<<"}}"<<res->right;
+		{		
 			if(res->right->type == 1)
 				cout<<res->right->val;
 			else
@@ -90,10 +78,6 @@ class SExp
 	SExp* input()
 	{		
 		int nxtToken = getNextToken();	
-//		cout<<"Return Int : "<<nxtToken<<'\n';
-//		cout<<"Token : "<<tokenVal<<'\n';
-//		cout<<"Localbuffer : "<<localBuffer<<'\n';
-//		cout<<"___________________________"<<'\n';										
 		if(nxtToken == 20)
 		{
 			cout<<"> Error : Unexpected token "<<tokenVal<<"\n";
@@ -101,22 +85,8 @@ class SExp
 		}	
 		else if(nxtToken == 1)
 		{
-//			cout<<"Return Int : "<<nxtToken<<'\n';
-//			cout<<"Token : "<<tokenVal<<'\n';	
 			SExp* s1 = input();
-//			cout<<"________________"<<'\n';
-//			cout<<"S1 ::: "<<'\n';
-//			print(s1);
-//			cout<<"________________"<<'\n';
 			int nxtToken = getNextToken();
-//			cout<<"-----------------------"<<'\n';
-//			cout<<"Car cdr check"<<'\n';
-//			cout<<"Token value : "<<tokenVal<<'\n';
-//			cout<<"Ret Value : "<<nxtToken<<'\n';
-//			cout<<"K = "<<k<<'\n';
-//			cout<<"STR = "<<str<<'\n';			
-//			cout<<"Local buffer : "<<localBuffer<<'\n';
-//			cout<<"-----------------------"<<'\n';
 			SExp *s2;
 			if(localBuffer == '.')
 			{				
@@ -129,27 +99,18 @@ class SExp
 				listNot = 1;
 				s2 = input2(nxtToken);
 			}			
-//			cout<<"________________"<<'\n';
-//			cout<<"S2 ::: "<<'\n';
-//			print(s2);
-//			cout<<"________________"<<'\n';											
 			return cons(s1, s2);
 		} 	
 		else if(nxtToken == 4 || nxtToken == 7)
 		{
-			//cout<<"Return Int : "<<nxtToken<<'\n';	
-			//cout<<"Token : "<<tokenVal<<'\n';
 			int i = atoi(tokenVal.c_str());
 			SExp* temp = new SExp();
 			temp->val = i;
 			temp->type = 1;
-			//input();
 			return temp;
 		}
 		else if(nxtToken == 5 || nxtToken == 8)
 		{
-			//cout<<"Return Int : "<<nxtToken<<'\n';	
-			//cout<<"Token : "<<tokenVal<<'\n';	
 			if(tokenVal == "NIL")	
 			{				
 				return Nil;	
@@ -180,28 +141,22 @@ class SExp
 			}
 			else
 			{
-				SExp* temp = new SExp();
-				//cout<<"TokenVal in ID : "<<tokenVal<<'\n';
+				SExp* temp = new SExp();			
 				if(idMap[tokenVal])
 				{
-					//cout<<"Existing ID"<<'\n';
 					temp = idMap[tokenVal];
 				}
 				else
 				{
-					//cout<<"Creating New Id"<<'\n';
 					temp->name = tokenVal;
 					temp->type = 2;
 					idMap[tokenVal] = temp;
-					//input();					
 				}			
 				return temp;						
 			}						
 		}		
 		else if(nxtToken >= 2 && nxtToken <= 8)
 		{
-			//cout<<"Return Int : "<<nxtToken<<'\n';	
-			//cout<<"Token : "<<tokenVal<<'\n';
 			input();	
 		}		
 		else
@@ -219,18 +174,10 @@ class SExp
 		else
 		{			
 			SExp* s1 = input();			
-//			cout<<"________________"<<'\n';
-//			cout<<"S1 Input 2::: "<<'\n';
-//			print(s1);
-//			cout<<"________________"<<'\n';
 			int nxtToken1 = getNextToken();
 			if(nxtToken1 == 6 && localBuffer == ')')
 				nxtToken1 = 2;		
 			SExp* s2 = input2(nxtToken1);
-//			cout<<"________________"<<'\n';
-//			cout<<"S2 Input 2 ::: "<<'\n';
-//			print(s2);
-//			cout<<"________________"<<'\n';
 			return cons(s1, s2);
 		}				
 	}
@@ -240,7 +187,6 @@ class SExp
 		tokenVal = "";
 		localBuffer = ' ';		
 		char c = str[k++];
-		//cout<<"C = "<<c<<'\n';
 		if(c=='(')
 		{
 			tokenVal += '(';
@@ -260,9 +206,6 @@ class SExp
 				c = str[k++];
 			}
 			k--;
-			/*if(c != '(' || !(c >= '0' && c <= '9') && !(c >= 'A' && c <= 'Z'))
-			{				
-			}*/
 			if(c == '.')
 			{
 				cout<<"> Error : Unexpected token dot\n";
@@ -354,7 +297,6 @@ class SExp
 	}	
 	void checkNextStr()
 	{
-		//cout<<"In checkNextStr"<<'\n';
 		char c = (char)fgetc(fp);
 		if( c == '$')
 		{
@@ -382,7 +324,6 @@ class SExp
 	
 	void init()
 	{	
-		//cout<<"Start"<<'\n';
 		SExp *res;
 		str = "";
 		k = 0;
@@ -411,17 +352,12 @@ class SExp
 			cout<<"> Error : Left and right paranthesis mismatch"<<'\n';
 			init();
 		}
-//		cout<<"Input : "<<str<<'\n';
-//		cout<<"K = "<<k<<'\n';
 		int nxtToken = getNextToken();
-//		cout<<"NXT Token 1 : "<<nxtToken<<'\n';
 		if(nxtToken == 1)
 		{
 			int nxtToken = getNextToken();
-//			cout<<"NXT Token 2 : "<<nxtToken<<'\n';
 			if(localBuffer == ')' || nxtToken == 2)
 			{
-				//cout<<"In localbuffer"<<'\n';				
 				res = Nil;
 			}
 			else
@@ -446,7 +382,6 @@ class SExp
 		else
 			print(res);	
 		cout<<'\n';
-		//print(res->right->left);
 		checkNextStr();		
 	}
 		
