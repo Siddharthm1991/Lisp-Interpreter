@@ -4,7 +4,7 @@ $
 $
 (B $ B)
 $
-(DEFUN NOTSOSILLY (A B) (COND ((EQ A 0) (PLUS B 1)) ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1)) (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1))))))
+(B .. B)
 $
 ()
 $
@@ -31,5 +31,7 @@ $
                (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1))))
              ))
 $
-(SILLY (CAR (QUOTE (5 6))) (CDR (QUOTE (5 . 6))) )			 
+( 2 (3 . 4) (5 . 6))
+$
+(SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6)     )) )
 $$
