@@ -3,7 +3,11 @@
 	1. Standard SExp for T and NIL (Done)
 	2. Run program for "()" input (Done) 
 	3. Use the same identifier instead of creating new ones (Implement by map) (Done)
-	4. Error checking
+	4. Error checking (Unexpected characters (Done), Multiple dots in a row, $ inside s-expression(Done), Parenthesis mismatch)	
+	5. Some s-expressions not being handled ( Right parenthesis issue resolved , dot and list mixed issue not working)
+	6. Signed integers (Done)
+	7. NIL in list notation not handled correctly 
+	8. Create the primitive functions (Half done)
 */
 //Lisp Interpreter Project
 #include<iostream>
@@ -31,6 +35,11 @@ class SExp
 	SExp *root;
 	SExp *Nil;
 	SExp *T;
+	SExp *CAR;
+	SExp *CDR;
+	SExp *DEFUN;
+	SExp *QUOTE;
+	SExp *COND;	
 	SExp()
 	{
 		type = -1;
@@ -54,8 +63,19 @@ class SExp
 	{		
 		int nxtToken = getNextToken();	
 //		cout<<"Return Int : "<<nxtToken<<'\n';
-//		cout<<"Token : "<<tokenVal<<'\n';			
-		if(nxtToken == 1)
+//		cout<<"Token : "<<tokenVal<<'\n';
+//		cout<<"Localbuffer : "<<localBuffer<<'\n';
+		if(nxtToken == 20)
+		{
+			cout<<"> Error : Unexpected token "<<atoi(tokenVal.c_str())<<"\n";
+			checkNextStr();
+		}	
+		else if(nxtToken == 2)
+		{
+			cout<<"> Error : Incorrect parenthesis\n";
+			checkNextStr();	
+		}				
+		else if(nxtToken == 1)
 		{
 //			cout<<"Return Int : "<<nxtToken<<'\n';
 //			cout<<"Token : "<<tokenVal<<'\n';	
@@ -103,6 +123,26 @@ class SExp
 			{				
 				return T;
 			}
+			else if(tokenVal == "CAR")
+			{				
+				return CAR;
+			}
+			else if(tokenVal == "CDR")
+			{				
+				return CDR;
+			}
+			else if(tokenVal == "DEFUN")
+			{				
+				return DEFUN;
+			}
+			else if(tokenVal == "QUOTE")
+			{				
+				return QUOTE;
+			}
+			else if(tokenVal == "COND")
+			{				
+				return COND;
+			}
 			else
 			{
 				SExp* temp = new SExp();
@@ -145,6 +185,8 @@ class SExp
 		{			
 			SExp* s1 = input();			
 			int nxtToken1 = getNextToken();
+			if(nxtToken1 == 6 && localBuffer == ')')
+				nxtToken1 = 2;		
 			SExp* s2 = input2(nxtToken1);
 			return cons(s1, s2);
 		}				
@@ -155,6 +197,7 @@ class SExp
 		tokenVal = "";
 		localBuffer = ' ';		
 		char c = str[k++];
+		//cout<<"C = "<<c<<'\n';
 		if(c=='(')
 		{
 			tokenVal += '(';
@@ -179,6 +222,27 @@ class SExp
 			}
 			k--;
 			return 4;
+		}
+		if(c == '+' || c == '-')
+		{
+			char op = c;
+			c = str[k++];
+			if(c >= '0' && c <= '9')
+			{
+				tokenVal += op;
+				while(c >= '0' && c <= '9')
+				{	
+					tokenVal += c;	
+					c = str[k++];
+				}
+				k--;
+				return 4;
+			}
+			else
+			{
+				cout<<"> Error : Unexpected token "<<op<<'\n';
+				checkNextStr();
+			}
 		}
 		if(c >= 'A' && c <= 'Z')
 		{
@@ -206,7 +270,13 @@ class SExp
 			return 6;			
 		}
 		if(c == EOF)
-			return 9;				
+			return 9;	
+		else
+		{						
+			tokenVal += c;
+			return 20;				
+		}
+			
 	}
 	
 	SExp* cons(SExp* s1, SExp* s2)
@@ -246,11 +316,30 @@ class SExp
 	
 	void checkNextStr()
 	{
+		//cout<<"In checkNextStr"<<'\n';
 		char c = (char)fgetc(fp);
 		if( c == '$')
+		{
 			cout<<"> Bye!"<<'\n';
+			exit(1);
+		}		
 		else
 			init();
+	}
+	
+	void skipTheRest()
+	{
+		str = "";		
+		char c = (char)fgetc(fp);
+		while(c != '$')
+		{
+			str += c;
+			c = (char)fgetc(fp);
+		}
+		if(int(str[str.size() - 1]) != 10)
+		{
+			skipTheRest();
+		}
 	}
 	
 	void init()
@@ -266,11 +355,21 @@ class SExp
 			str += c;
 			c = (char)fgetc(fp);
 		}		
-		//cout<<"Input : "<<str<<'\n';
+		if(int(str[str.size() - 1]) != 10)
+		{
+			cout<<"> Error : Unexpected token $"<<'\n';
+			skipTheRest();
+			c = fgetc(fp);
+			init();
+		}
+//		cout<<"Input : "<<str<<'\n';
+//		cout<<"K = "<<k<<'\n';
 		int nxtToken = getNextToken();
+//		cout<<"NXT Token 1 : "<<nxtToken<<'\n';
 		if(nxtToken == 1)
 		{
 			int nxtToken = getNextToken();
+//			cout<<"NXT Token 2 : "<<nxtToken<<'\n';
 			if(localBuffer == ')' || nxtToken == 2)
 			{
 				//cout<<"In localbuffer"<<'\n';				
@@ -308,6 +407,12 @@ int main()
 	SExp s;	
 	s.Nil = new SExp("NIL");
 	s.T = new SExp("T");
+	s.CAR = new SExp("CAR");
+	s.CDR = new SExp("CDR");
+	s.DEFUN = new SExp("DEFUN");
+	s.COND = new SExp("COND");
+	s.QUOTE = new SExp("QUOTE");
 	s.init();	
+	cout<<"Done"<<'\n';
 }
 
