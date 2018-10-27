@@ -1,0 +1,10 @@
+(DEFUN MINUS2 (A B) (MINUS A B))
+$
+(MINUS2 789 1343)
+$
+(CONS 4 (QUOTE (A . B)))
+$
+(CAR (QUOTE (A . B)))
+$
+(PLUS 5 2)
+$$
