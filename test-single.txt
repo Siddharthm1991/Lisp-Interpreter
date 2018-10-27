@@ -2,6 +2,10 @@
 $
 (MINUS2 789 1343)
 $
+(DEFUN SILLY (A B) (PLUS A B))
+$
+(SILLY 163 1367)
+$
 (CONS 4 (QUOTE (A . B)))
 $
 (CAR (QUOTE (A . B)))
