@@ -1,0 +1,43 @@
+(DEFUN (F1 ()) 100)
+$
+(F1 )
+$
+(PLUS)
+$
+(PLUS  )
+$
+(CONS 4 (A . B))
+$
+(PLUS 4)
+$
+(CONS T 42								)
+$
+(CONS 4 T)
+$
+(CONS (CONS 2 3) 5)
+$
+(CONS (QUOTE (2 . 3)) (QUOTE (4 . 5)))
+$
+(CONS 4 (QUOTE (A . B)))
+$
+(CONS 4 (A . B))
+$
+(DEFUN (SILLY (A B)) (PLUS A B))
+$
+(SILLY 5)
+$
+(SILLY (CAR (QUOTE (5 . 6))) (CDR (QUOTE (5 . 6))) )
+$
+(DEFUN (MINUS2 (A B)) (MINUS A B))
+$
+(DEFUN (NOTSOSILLY (A B)) 
+            (COND
+               ((EQ A 0) (PLUS B 1))
+               ((EQ B 0) (NOTSOSILLY (MINUS2 A 1) 1))
+			   (T (NOTSOSILLY (MINUS2 A 1) (NOTSOSILLY A (MINUS2 B 1))))               
+             ))
+$
+(NOTSOSILLY 0 0 0)
+$
+(NOTSOSILLY 1 1)			 
+$$

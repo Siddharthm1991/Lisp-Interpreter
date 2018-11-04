@@ -1,0 +1,2 @@
+all: InterpreterP2.cpp
+		g++ -o Interpreter InterpreterP2.cpp

@@ -1,0 +1,29 @@
+The part 2 of the project implements the eval routine of the LISP Interpreter. The eval routine evaluates the input s - expression from the user and checks if it is a valid LISP expression. If it a valid LISP expression it is evaluated and the result is printed. The output routine prints an error if the s-expression is not a valid LISP expression else prints the result of the expression.
+
+InterpreterP2.cpp - The C++ file that takes care of both the eval and output routine
+
+Class
+------
+
+SExp - The main class which contains all the attributes and methods to validate and build a tree and evaluate the LISP expression 
+
+	Methods
+	--------
+	
+	print(SExp* res) - Takes one argument which should be a SExp node and petty prints the tree in dot notation from that node.
+	
+	input() - The input routine that is used to handle s - expressions that are in the dot notation form. The method returns the root of the generated tree for the input s - expression
+	
+	input2(int nxtToken) - The input routine that is used to handle the sub s - expressions that are in the list notation form. The method returns the root of the tree of the sub - expression
+	
+	getNextToken() - Finds the next token and returns an integer number to signify the type of token. 1 -> Left Parenthesis , 2 -> Right Parenthesis , 3 -> Dot , 4 -> Integer token ,
+	5 -> Identifier , 6 -> Space , 9 -> EOF , 20 -> Any other token
+	
+	cons(SExp* s1, SExp* s2) - Returns the cons of the s - expression given in the input
+	
+	checkNextStr() - Check if next string is available in the standard input
+	
+	skipTheRest() - If $ encountered inside an s-expression skip the rest of the s-expression
+	
+	init() - The initialize method to reset the global variable values and get the tokens from standard input and store in a string. Also once s-expression is entered, call the input method
+	
