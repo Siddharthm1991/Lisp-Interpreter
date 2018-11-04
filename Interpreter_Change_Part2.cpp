@@ -1,4 +1,9 @@
-//Lisp Interpreter Project
+/*Cases not handled
+	1. No parameter functions (Done)
+	2. When passing only function name, error in parsing if there is space between closing brackets and function name (Done)
+	3. QUOTE missing, print appropriate error message (Done)
+*/	
+//Lisp Interpreter Project Part 2 (Changes done to accomodate syntax change of DEFUN)
 #include<iostream>
 #include<string>
 #include<vector>
@@ -97,8 +102,16 @@ class SExp
 		}	
 		else if(nxtToken == 1)
 		{
-			SExp* s1 = input();
 			int nxtToken = getNextToken();
+//			cout<<"Next token between ( :  "<<nxtToken<<'\n';
+//			cout<<"Value between ( : "<<tokenVal<<'\n';
+//			cout<<"Local Buffer : "<<localBuffer<<'\n';			
+			if(nxtToken == 2 || localBuffer == ')')
+				return Nil;
+			else
+				k-= tokenVal.size();
+			SExp* s1 = input();
+			nxtToken = getNextToken();			
 			SExp *s2;
 			if(localBuffer == '.')
 			{				
@@ -180,7 +193,9 @@ class SExp
 	}	
 	
 	SExp* input2(int nxtToken)
-	{			
+	{				
+		if(localBuffer == ')')
+			return Nil;
 		if(nxtToken == 2)
 		{					
 			return Nil;
@@ -317,7 +332,10 @@ class SExp
 //		cout<<print(s1)<<'\n';
 //		cout<<'\n';
 		if(atom(s1) == T)
-			cout<<" > Error : CAR operation being performed on an atomic s-expression\n";
+		{
+			cout<<"> Error : CAR operation being performed on an atomic s-expression\n";
+			checkNextStr();
+		}	
 		else
 			return s1->left;
 	}	
@@ -325,7 +343,10 @@ class SExp
 	SExp* cdr(SExp* s1)
 	{
 		if(atom(s1) == T)
-			cout<<" > Error : CDR operation being performed on an atomic s-expression\n";
+		{
+			cout<<"> Error : CDR operation being performed on an atomic s-expression\n";
+			checkNextStr();			
+		}			
 		else
 			return s1->right;
 	}
@@ -501,7 +522,8 @@ class SExp
 //		cout<<'\n';
 		if(null(be) == T)
 		{
-			cout<<" > Error : No conditions in cond!\n";
+			cout<<"> Error : No more conditions to evaluate in COND\n";
+			checkNextStr();
 		}		
 		if(eval(car(car(be)), aList) == T)
 		{
@@ -542,11 +564,19 @@ class SExp
 		else
 		{
 //			cout<<"List is not null in evlis"<<'\n';
-			SExp* tempEvalRes = eval(car(list) , aList);
-			SExp* tempEvlisRes = evlis(cdr(list), aList);
-			SExp *evlisRes = cons(tempEvalRes , tempEvlisRes);
-			//SExp* evlisRes =  cons(eval(car(list) , aList) , evlis(cdr(list), aList));
-			return evlisRes;
+			if(atom(list) == Nil)
+			{
+				SExp* tempEvalRes = eval(car(list) , aList);
+				SExp* tempEvlisRes = evlis(cdr(list), aList);
+				SExp *evlisRes = cons(tempEvalRes , tempEvlisRes);
+				//SExp* evlisRes =  cons(eval(car(list) , aList) , evlis(cdr(list), aList));
+				return evlisRes;	
+			}			
+			else
+			{
+				cout<<"> Error : Not a LISP Expression\n";
+				checkNextStr();
+			}
 		}
 	}
 	
@@ -555,7 +585,7 @@ class SExp
 //		cout<<"In get val ::"<<'\n';
 //		cout<<exp->name<<'\n';
 //		print(list);
-//		cout<<'\n';
+//		cout<<'\n';		
 		if(null(list) == T)
 		{
 			return Nil;
@@ -592,54 +622,248 @@ class SExp
 			return in(a , cdr(aList));
 	}
 	
+	int getLength(SExp* startNode)
+	{
+		int count = 0;
+		while(startNode)
+		{
+			count++;
+			startNode = startNode->right;
+		}
+		return count;
+	}
+	
 	SExp* apply(SExp *f, SExp *x , SExp *aList)
 	{
 //		cout<<"Print evlis result"<<'\n';
 //		print(x);
 //		cout<<"In apply : "<<f->name<<'\n';
+		int xCount = getLength(x) - 1;
 		if(atom(f) == T)
 		{
 //			cout<<"F is atom"<<'\n';
 			if(eq(f,PLUS) == T)
-				return plus(car(x) , car(cdr(x)));	
+			{
+				if(xCount == 2)
+					return plus(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for PLUS\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for PLUS\n";
+					checkNextStr();	
+				}					
+			}				
 			
 			if(eq(f,MINUS) == T)
-				return minus(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return minus(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for MINUS\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for MINUS\n";
+					checkNextStr();	
+				}
+			}				
 				
 			if(eq(f,CAR) == T)
-				return car(car(x));
+			{				
+				if(xCount == 1)
+					return car(car(x));
+				else if(xCount < 1)
+				{
+					cout<<"> Error : Too few arguments. Expected 1 argument for CAR\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 1 argument for CAR\n";
+					checkNextStr();	
+				}
+			}				
 				
 			if(eq(f,CDR) == T)
-				return cdr(car(x));
+			{
+				if(xCount == 1)
+					return cdr(car(x));
+				else if(xCount < 1)
+				{
+					cout<<"> Error : Too few arguments. Expected 1 argument for CDR\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 1 argument for CDR\n";
+					checkNextStr();	
+				}
+			}				
 			
 			if(eq(f,CONS) == T)
-				return cons(car(x) , cdr(x));	
+			{
+				if(xCount == 2)
+					return cons(car(x) , car(cdr(x)));	
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for CONS\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for CONS\n";
+					checkNextStr();	
+				}
+			}				
 			
 			if(eq(f,EQ) == T)
-				return eq(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return eq(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for EQ\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for EQ\n";
+					checkNextStr();	
+				}
+			}
 			
 			if(eq(f,ATOM) == T)
-				return atom(car(x));
+			{
+				if(xCount == 1)
+					return atom(car(x));
+				else if(xCount < 1)
+				{
+					cout<<"> Error : Too few arguments. Expected 1 argument for ATOM\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 1 argument for ATOM\n";
+					checkNextStr();	
+				}
+			}				
 				
 			if(eq(f,TIMES) == T)
-				return times(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return times(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for TIMES\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for TIMES\n";
+					checkNextStr();	
+				}
+			}				
 			
 			if(eq(f,QUOTIENT) == T)
-				return quotient(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return quotient(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for QUOTIENT\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for QUOTIENT\n";
+					checkNextStr();	
+				}
+			}				
 				
 			if(eq(f,REMAINDER) == T)
-				return remainder(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return remainder(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for REMAINDER\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for REMAINDER\n";
+					checkNextStr();	
+				}
+			}				
 				
 			if(eq(f,LESS) == T)
-				return less(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return less(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for LESS\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for LESS\n";
+					checkNextStr();	
+				}
+			}				
 			
 			if(eq(f,GREATER) == T)
-				return greater(car(x) , car(cdr(x)));
+			{
+				if(xCount == 2)
+					return greater(car(x) , car(cdr(x)));
+				else if(xCount < 2)
+				{
+					cout<<"> Error : Too few arguments. Expected 2 arguments for GREATER\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 2 arguments for GREATER\n";
+					checkNextStr();	
+				}
+			}				
 											
 			else
-			{				
-				aList = addPairs(car(getVal(f,dList)), x , aList);				
-				return eval(car(cdr(getVal(f,dList))) , aList);
+			{	
+//				cout<<"Parameters : "<<'\n';
+//				print(car(getVal(f,dList)));
+//				cout<<'\n';
+//				cout<<"Arguements : "<<'\n';
+//				print(x);			
+//				cout<<'\n';				
+				if(atom(getVal(f,dList)) == T)
+				{
+					cout<<"> Error : Function not defined. Please check\n";
+					checkNextStr();
+				}
+				else
+				{
+					int plCount = getLength(car(getVal(f,dList)));	
+					int argCount = getLength(x);
+					if(plCount > argCount)
+					{
+						cout<<"> Error : Too few arguments. Expected "<<plCount - 1<<" arguments for "<<f->name<<"\n";
+						checkNextStr();
+					}
+					if(plCount < argCount)
+					{
+						cout<<"> Error : Too many arguments. Expected "<<plCount - 1<<" arguments for "<<f->name<<"\n";
+						checkNextStr();
+					}
+					aList = addPairs(car(getVal(f,dList)), x , aList);				
+					return eval(car(cdr(getVal(f,dList))) , aList);
+				}				
 			}
 																																				
 		}
