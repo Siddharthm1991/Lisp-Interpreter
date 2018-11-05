@@ -1,4 +1,4 @@
-Run the makefile: make -f MakefileP2
+Run the makefile: make -f MakefileP2.txt
 
 Compile the CPP File: g++ -o Interpreter InterpreterP2.cpp
 

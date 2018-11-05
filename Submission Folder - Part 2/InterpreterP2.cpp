@@ -46,6 +46,8 @@ class SExp
 	SExp *GREATER;
 	SExp *EQ;	
 	SExp *ATOM;
+	SExp *NULLL;
+	SExp *INT;
 	SExp *dList;
 	SExp()
 	{
@@ -348,6 +350,11 @@ class SExp
 	
 	SExp* eq(SExp* s1, SExp* s2)
 	{
+		if(atom(s1) == Nil || atom(s2) == Nil)
+		{
+			cout<<"> Error : EQ operation cannot be performed on non atomic s-expressions\n";
+			checkNextStr();
+		}
 		if(s1->type != s2->type)
 		{
 			return Nil;
@@ -442,13 +449,21 @@ class SExp
 	}
 	
 	SExp* quotient(SExp *s1, SExp *s2)
-	{
+	{		
 		if(intr(s1) == T && intr(s2) == T)
 		{
-			SExp* temp = new SExp();
-			temp->type = 1;
-			temp->val = s1->val / s2->val;
-			return temp;
+			if(s2->val == 0)
+			{
+				cout<<"> Error : Division by zero error\n";
+				checkNextStr();	
+			}
+			else
+			{
+				SExp* temp = new SExp();
+				temp->type = 1;
+				temp->val = s1->val / s2->val;
+				return temp;
+			}						
 		}
 		else
 		{
@@ -461,10 +476,18 @@ class SExp
 	{
 		if(intr(s1) == T && intr(s2) == T)
 		{
-			SExp* temp = new SExp();
-			temp->type = 1;
-			temp->val = s1->val % s2->val;
-			return temp;
+			if(s2->val == 0)
+			{
+				cout<<"> Error : Division by zero error\n";
+				checkNextStr();	
+			}
+			else
+			{
+				SExp* temp = new SExp();
+				temp->type = 1;
+				temp->val = s1->val % s2->val;
+				return temp;	
+			}			
 		}
 		else
 		{
@@ -679,6 +702,7 @@ class SExp
 			
 			if(eq(f,EQ) == T)
 			{
+				
 				if(xCount == 2)
 					return eq(car(x) , car(cdr(x)));
 				else if(xCount < 2)
@@ -771,7 +795,39 @@ class SExp
 					cout<<"> Error : Too many arguments. Expected 2 arguments for LESS\n";
 					checkNextStr();	
 				}
-			}				
+			}	
+			
+			if(eq(f,NULLL) == T)
+			{
+				if(xCount == 1)
+					return null(car(x));
+				else if(xCount < 1)
+				{
+					cout<<"> Error : Too few arguments. Expected 1 argument for NULL\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 1 argument for NULL\n";
+					checkNextStr();	
+				}
+			}
+			
+			if(eq(f,INT) == T)
+			{
+				if(xCount == 1)
+					return intr(car(x));
+				else if(xCount < 1)
+				{
+					cout<<"> Error : Too few arguments. Expected 1 argument for INT\n";
+					checkNextStr();
+				}					
+				else
+				{
+					cout<<"> Error : Too many arguments. Expected 1 argument for INT\n";
+					checkNextStr();	
+				}
+			}			
 			
 			if(eq(f,GREATER) == T)
 			{
@@ -995,6 +1051,8 @@ int main()
 	s.REMAINDER = new SExp("REMAINDER");
 	s.LESS = new SExp("LESS");
 	s.GREATER = new SExp("GREATER"); 
+	s.NULLL = new SExp("NULL");
+	s.INT = new SExp("INT");  
 	s.dList = s.Nil;
 	s.init();	
 	cout<<"Done"<<'\n';

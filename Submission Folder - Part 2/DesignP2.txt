@@ -10,6 +10,55 @@ SExp - The main class which contains all the attributes and methods to validate 
 	Methods
 	--------
 	
+	Part 2
+	------
+	
+	car(SExp* s1) - Function to get the CAR of the given s-expression. Expects one non-atomic s-expression as input.
+	
+	cdr(SExp* s1) - Function to get the CDR of the given s-expression. Expects one non-atomic s-expression as input.
+	
+	eq(SExp* s1, SExp* s2) - Function to check the equality of two atomic expressions. Returns T if true else NIL.
+	
+	atom(SExp *s1) - Function to check if the s-expression is an atom. Returns T if true else NIL.
+	
+	intr(SExp *s1) - Function to check if the s-expression is an integer atom. Returns T if true else NIL.
+	
+	null(SExp *s1) - Function to check if the s-expression is NIL. Returns T if true else NIL.
+	
+	plus(SExp *s1, SExp *s2) - Function to get sum of two integer atoms.
+	
+	minus(SExp *s1, SExp *s2) - Function to get difference of two integer atoms.
+	
+	times(SExp *s1, SExp *s2) - Function to get product of two integer atoms.
+	
+	quotient(SExp *s1, SExp *s2) - Function to get quotient of two integer atoms.
+	
+	remainder(SExp *s1, SExp *s2) - Function to get remainder of two integer atoms.
+	
+	less(SExp *s1, SExp *s2) - Function to check if value in s1 is less than s2. Returns T if true else NIL.
+	
+	greater(SExp *s1, SExp *s2) - Function to check if value in s1 is greater than s2. Returns T if true else NIL.
+	
+	evcon(SExp *be, SExp *aList) - Helper function to evaluate the conditions in COND.
+	
+	evlis(SExp *list, SExp* aList) - Helper function to evaluate the arguments of a function call.
+	
+	getVal(SExp* exp, SExp* list) - Get the value of the exp from the dList or aList.
+	
+	addPairs(SExp* pList, SExp* x, SExp* aList) - Add pairs of parameter names and values to the aList.
+	
+	in(SExp* a, SExp* aList) - Check of the s-expression a exists in the aList.
+	
+	getLength(SExp* startNode) - Get count of the number of s-expressions in the given argument.
+	
+	apply(SExp *f, SExp *x , SExp *aList) - Helper function used to check if function being applied is a primitive function or newly defined function. If it is primitive function the corresponding auxiliary function is called else eval is called on the user defined function.
+	
+	eval(SExp *exp, SExp *aList) - Helper function that is called to evaluate the s-expression provided. The eval checks if it is atomic atom and returns the corresponding atom if it is atom. Else if the CAR of the expression is an atom we check if it is of the special form QUOTE or COND. Else the apply function is called to identify the function and call the appropriate auxiliary function.
+	
+	init() - Init method modified to call the eval method after the input method and print the result of the evaluated expression. Also if the expression is a DEFUN expression create the internal representation for it, print the function name and skip to the next s-expression.
+	
+	Part 1
+	------
 	print(SExp* res) - Takes one argument which should be a SExp node and petty prints the tree in dot notation from that node.
 	
 	input() - The input routine that is used to handle s - expressions that are in the dot notation form. The method returns the root of the generated tree for the input s - expression
@@ -26,4 +75,9 @@ SExp - The main class which contains all the attributes and methods to validate 
 	skipTheRest() - If $ encountered inside an s-expression skip the rest of the s-expression
 	
 	init() - The initialize method to reset the global variable values and get the tokens from standard input and store in a string. Also once s-expression is entered, call the input method
+
+Points to take care when testing
+---------------------------------
+	- For functions with no parameters represent NIL as () [without any spaces between '(' and ')']
+
 	
